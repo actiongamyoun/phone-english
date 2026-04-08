@@ -17,7 +17,7 @@ const DS = {
 
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   ::-webkit-scrollbar { display: none; }
   @keyframes fadeUp  { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
@@ -25,26 +25,8 @@ const GLOBAL_CSS = `
   @keyframes dots    { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
   @keyframes waveBar { 0%,100%{height:6px} 50%{height:22px} }
   .lesson-card:hover { transform:translateY(-3px) !important; box-shadow:0 12px 32px rgba(28,58,47,0.15) !important; }
-  .nav-item:hover    { color:#C9963A !important; }
   .cta-btn:active    { transform:scale(0.97); }
 `;
-
-const TEAM: Record<string, { name: string; emoji: string; color: string }> = {
-  planner:  { name:"기획자 Sarah",    emoji:"🎯", color:"#C0392B" },
-  educator: { name:"교육자 Dr. Kim",  emoji:"👩‍🏫", color:"#2E5744" },
-  ceo:      { name:"사장님 James",    emoji:"👔", color:"#2980B9" },
-  designer: { name:"디자이너 Mia",    emoji:"🎨", color:"#C9963A" },
-};
-
-const TEAM_CHAT = [
-  { speaker:"planner",  text:"레벨 3단계로 나누고 온보딩에서 레벨 테스트 먼저 해야 해요!", delay:0 },
-  { speaker:"educator", text:"상황 기반 커리큘럼으로 실용성 높이고, AI 발음 피드백도 실시간 제공합시다.", delay:1200 },
-  { speaker:"ceo",      text:"5분짜리 짧은 레슨! 바쁜 직장인도 점심시간에 할 수 있어야 해요.", delay:2400 },
-  { speaker:"designer", text:"보라 그라디언트는 너무 흔해요. 크림+포레스트 그린 팔레트로 갑시다!", delay:3600 },
-  { speaker:"designer", text:"Playfair Display 헤드라인에 스티치 디테일 카드! 손그림 느낌의 점선 테두리 넣을게요 ✏️", delay:4800 },
-  { speaker:"educator", text:"학습 몰입도가 훨씬 높아질 것 같아요. 교정 팁도 엽서 스타일로!", delay:6000 },
-  { speaker:"ceo",      text:"완벽해요. 프리미엄 느낌이 구독 전환율에도 긍정적일 거예요 💰", delay:7200 },
-];
 
 const LESSONS = [
   { id:1, level:"Beginner",     topic:"자기소개",     emoji:"👋", duration:"5분",  description:"기본 인사와 자기소개 표현" },
@@ -63,87 +45,47 @@ const LEVEL_META: Record<string, { label: string; bg: string; text: string; bord
 
 function StitchBorder({ color = DS.gold, opacity = 0.35 }: { color?: string; opacity?: number }) {
   return (
-    <div style={{
-      position:"absolute", inset:0, pointerEvents:"none",
-      border:`1.5px dashed ${color}`,
-      opacity, margin:5, borderRadius:14,
-    }}/>
-  );
-}
-
-function TeamChatBubble({ msg, visible }: { msg: typeof TEAM_CHAT[0]; visible: boolean }) {
-  const t = TEAM[msg.speaker];
-  return (
-    <div style={{
-      display:"flex", gap:10, alignItems:"flex-start",
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(14px)",
-      transition:"all 0.55s cubic-bezier(.22,.68,0,1.2)",
-    }}>
-      <div style={{
-        width:36, height:36, borderRadius:"50%", flexShrink:0,
-        background:`${t.color}18`, border:`2px solid ${t.color}`,
-        display:"flex", alignItems:"center", justifyContent:"center", fontSize:16,
-      }}>{t.emoji}</div>
-      <div>
-        <div style={{ fontSize:10, color:t.color, fontWeight:700, marginBottom:3,
-          fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>{t.name}</div>
-        <div style={{
-          background:DS.white, borderRadius:"3px 16px 16px 16px",
-          padding:"10px 14px", fontSize:13, color:DS.ink,
-          boxShadow:"0 3px 12px rgba(28,58,47,0.10)", maxWidth:256, lineHeight:1.55,
-          fontFamily:"'DM Sans','Noto Sans KR',sans-serif",
-          border:`1px solid ${t.color}28`,
-        }}>{msg.text}</div>
-      </div>
-    </div>
+    <div style={{ position:"absolute", inset:0, pointerEvents:"none",
+      border:`1.5px dashed ${color}`, opacity, margin:5, borderRadius:14 }}/>
   );
 }
 
 function LessonCard({ lesson, onSelect, index }: {
-  lesson: typeof LESSONS[0];
-  onSelect: (l: typeof LESSONS[0]) => void;
-  index: number;
+  lesson: typeof LESSONS[0]; onSelect: (l: typeof LESSONS[0]) => void; index: number;
 }) {
   const lm = LEVEL_META[lesson.level];
   return (
     <div className="lesson-card" onClick={() => onSelect(lesson)} style={{
-      position:"relative", background:DS.white, borderRadius:20,
-      padding:"16px 18px", cursor:"pointer",
-      border:`1.5px solid ${lm.border}55`,
+      position:"relative", background:DS.white, borderRadius:20, padding:"16px 18px",
+      cursor:"pointer", border:`1.5px solid ${lm.border}55`,
       boxShadow:"0 4px 16px rgba(28,58,47,0.07)", transition:"all 0.25s ease",
       display:"flex", alignItems:"center", gap:14, overflow:"hidden",
       animation:`fadeUp 0.4s ${index*0.07}s both`,
     }}>
       <StitchBorder color={lm.border} opacity={0.6}/>
-      <div style={{
-        position:"absolute", right:-16, top:-16, width:70, height:70,
-        background:lm.bg, borderRadius:"50%", filter:"blur(16px)", opacity:0.9,
-      }}/>
-      <div style={{
-        width:52, height:52, borderRadius:16, background:lm.bg,
+      <div style={{ position:"absolute", right:-16, top:-16, width:70, height:70,
+        background:lm.bg, borderRadius:"50%", filter:"blur(16px)", opacity:0.9 }}/>
+      <div style={{ width:52, height:52, borderRadius:16, background:lm.bg,
         display:"flex", alignItems:"center", justifyContent:"center",
-        fontSize:24, flexShrink:0, border:`1.5px solid ${lm.border}`, position:"relative", zIndex:1,
-      }}>{lesson.emoji}</div>
+        fontSize:24, flexShrink:0, border:`1.5px solid ${lm.border}`, position:"relative", zIndex:1 }}>
+        {lesson.emoji}
+      </div>
       <div style={{ flex:1, position:"relative", zIndex:1 }}>
-        <div style={{ fontWeight:700, fontSize:15, color:DS.forest,
-          fontFamily:"'Playfair Display',serif" }}>{lesson.topic}</div>
-        <div style={{ fontSize:12, color:DS.muted, marginTop:3,
-          fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>{lesson.description}</div>
+        <div style={{ fontWeight:700, fontSize:15, color:DS.forest, fontFamily:"'Playfair Display',serif" }}>{lesson.topic}</div>
+        <div style={{ fontSize:12, color:DS.muted, marginTop:3, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>{lesson.description}</div>
       </div>
       <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:5, position:"relative", zIndex:1 }}>
-        <span style={{
-          background:lm.bg, color:lm.text, fontSize:10, fontWeight:700,
-          padding:"3px 10px", borderRadius:20, border:`1px solid ${lm.border}`,
-          fontFamily:"'DM Sans',sans-serif",
-        }}>{lm.label}</span>
+        <span style={{ background:lm.bg, color:lm.text, fontSize:10, fontWeight:700,
+          padding:"3px 10px", borderRadius:20, border:`1px solid ${lm.border}`, fontFamily:"'DM Sans',sans-serif" }}>
+          {lm.label}
+        </span>
         <span style={{ fontSize:11, color:DS.muted }}>⏱ {lesson.duration}</span>
       </div>
     </div>
   );
 }
 
-type Message = { role: "ai" | "user"; english?: string; korean?: string; tip?: string; text?: string };
+type Message = { role:"ai"|"user"; english?:string; korean?:string; tip?:string; text?:string };
 
 function CallScreen({ lesson, onEnd }: { lesson: typeof LESSONS[0]; onEnd: () => void }) {
   const [seconds, setSeconds] = useState(0);
@@ -174,13 +116,8 @@ function CallScreen({ lesson, onEnd }: { lesson: typeof LESSONS[0]; onEnd: () =>
         content: m.english || m.text || "",
       }));
       const res = await fetch("/api/chat", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          messages: [...history, { role:"user", content:userMsg }],
-          topic: lesson.topic,
-          level: lesson.level,
-        }),
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ messages:[...history,{role:"user",content:userMsg}], topic:lesson.topic, level:lesson.level }),
       });
       const parsed = await res.json();
       setMessages(m => [...m, { role:"ai", ...parsed }]);
@@ -191,9 +128,10 @@ function CallScreen({ lesson, onEnd }: { lesson: typeof LESSONS[0]; onEnd: () =>
   };
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", height:"100%",
+    <div style={{ display:"flex", flexDirection:"column", width:"100vw", height:"100dvh",
       background:DS.forest, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>
-      <div style={{ padding:"22px 20px 16px", background:`linear-gradient(180deg,#0F2218 0%,${DS.forest} 100%)` }}>
+      <div style={{ padding:"22px 20px 16px", paddingTop:"max(env(safe-area-inset-top,0px) + 16px, 22px)",
+        background:`linear-gradient(180deg,#0F2218 0%,${DS.forest} 100%)` }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
           <div>
             <div style={{ color:DS.goldLight, fontSize:10, fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase" }}>통화 중</div>
@@ -207,177 +145,173 @@ function CallScreen({ lesson, onEnd }: { lesson: typeof LESSONS[0]; onEnd: () =>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:3, height:28 }}>
           {Array.from({length:20}).map((_,i) => (
-            <div key={i} style={{
-              flex:1, borderRadius:3, minHeight:4,
+            <div key={i} style={{ flex:1, borderRadius:3, minHeight:4,
               background: isThinking ? DS.gold : `${DS.sage}88`,
               height: isThinking ? undefined : `${Math.sin(i)*8+10}px`,
-              animation: isThinking ? `waveBar 0.8s ${(i%5)*0.12}s ease-in-out infinite` : "none",
-            }}/>
+              animation: isThinking ? `waveBar 0.8s ${(i%5)*0.12}s ease-in-out infinite` : "none" }}/>
           ))}
         </div>
       </div>
 
       <div style={{ flex:1, overflowY:"auto", padding:"14px 16px", display:"flex", flexDirection:"column", gap:12 }}>
-        {messages.map((msg, i) => (
+        {messages.map((msg,i) => (
           <div key={i} style={{ display:"flex", flexDirection:"column",
-            alignItems: msg.role==="user" ? "flex-end" : "flex-start",
-            animation:`fadeUp 0.3s ${i*0.04}s both` }}>
+            alignItems:msg.role==="user"?"flex-end":"flex-start", animation:`fadeUp 0.3s ${i*0.04}s both` }}>
             {msg.role==="ai" ? (
               <div>
-                <div style={{ background:"#243D32", border:`1px solid ${DS.sage}44`, borderRadius:"4px 18px 18px 18px", padding:"11px 15px", maxWidth:268, color:DS.white, fontSize:14, lineHeight:1.6 }}>
-                  <div style={{ fontWeight:500 }}>{msg.english || msg.text}</div>
+                <div style={{ background:"#243D32", border:`1px solid ${DS.sage}44`, borderRadius:"4px 18px 18px 18px",
+                  padding:"11px 15px", maxWidth:"72vw", color:DS.white, fontSize:14, lineHeight:1.6 }}>
+                  <div style={{ fontWeight:500 }}>{msg.english||msg.text}</div>
                   {msg.korean && <div style={{ fontSize:11, color:DS.sage, marginTop:5 }}>{msg.korean}</div>}
                 </div>
-                {msg.tip && (
-                  <div style={{ marginTop:5, background:`${DS.gold}18`, border:`1px solid ${DS.gold}44`, borderRadius:10, padding:"7px 12px", fontSize:11, color:DS.goldLight, maxWidth:268 }}>✏️ {msg.tip}</div>
-                )}
+                {msg.tip && <div style={{ marginTop:5, background:`${DS.gold}18`, border:`1px solid ${DS.gold}44`,
+                  borderRadius:10, padding:"7px 12px", fontSize:11, color:DS.goldLight, maxWidth:"72vw" }}>✏️ {msg.tip}</div>}
               </div>
             ) : (
-              <div style={{ background:`linear-gradient(135deg,${DS.moss},${DS.sage})`, borderRadius:"18px 4px 18px 18px", padding:"11px 15px", maxWidth:220, color:DS.white, fontSize:14, lineHeight:1.6, fontWeight:500, boxShadow:`0 4px 14px ${DS.moss}66` }}>{msg.text}</div>
+              <div style={{ background:`linear-gradient(135deg,${DS.moss},${DS.sage})`, borderRadius:"18px 4px 18px 18px",
+                padding:"11px 15px", maxWidth:"60vw", color:DS.white, fontSize:14, lineHeight:1.6, fontWeight:500 }}>{msg.text}</div>
             )}
           </div>
         ))}
         {isThinking && (
           <div style={{ display:"flex", gap:5, padding:"8px 4px" }}>
-            {[0,1,2].map(i => (
-              <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:DS.sage, animation:`dots 1.2s ${i*0.2}s infinite ease-in-out` }}/>
-            ))}
+            {[0,1,2].map(i => <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:DS.sage, animation:`dots 1.2s ${i*0.2}s infinite ease-in-out` }}/>)}
           </div>
         )}
         <div ref={bottomRef}/>
       </div>
 
-      <div style={{ padding:"12px 16px 28px", background:`linear-gradient(0deg,#0F2218 0%,${DS.forest} 100%)`, borderTop:`1px solid ${DS.moss}66` }}>
+      <div style={{ padding:"12px 16px", paddingBottom:"max(calc(env(safe-area-inset-bottom) + 12px), 20px)",
+        background:`linear-gradient(0deg,#0F2218 0%,${DS.forest} 100%)`, borderTop:`1px solid ${DS.moss}66` }}>
         <div style={{ display:"flex", gap:8, alignItems:"center" }}>
           <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()}
             placeholder="영어로 입력하세요..."
-            style={{ flex:1, background:"#243D32", border:`1.5px solid ${DS.sage}55`, borderRadius:28, padding:"12px 18px", color:DS.white, fontSize:14, outline:"none", fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}/>
-          <button onClick={send} style={{ width:46, height:46, borderRadius:"50%", flexShrink:0, background:`linear-gradient(135deg,${DS.gold},${DS.goldLight})`, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, boxShadow:`0 4px 14px ${DS.gold}55` }}>➤</button>
+            style={{ flex:1, background:"#243D32", border:`1.5px solid ${DS.sage}55`, borderRadius:28,
+              padding:"12px 18px", color:DS.white, fontSize:14, outline:"none", fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}/>
+          <button onClick={send} style={{ width:46, height:46, borderRadius:"50%", flexShrink:0,
+            background:`linear-gradient(135deg,${DS.gold},${DS.goldLight})`, border:"none", cursor:"pointer",
+            display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>➤</button>
         </div>
-        <button onClick={onEnd} style={{ width:"100%", marginTop:10, background:"transparent", border:`1.5px solid ${DS.errorRed}88`, borderRadius:14, padding:"11px", color:`${DS.errorRed}cc`, fontWeight:700, cursor:"pointer", fontSize:13, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>📵 통화 종료</button>
+        <button onClick={onEnd} style={{ width:"100%", marginTop:10, background:"transparent",
+          border:`1.5px solid ${DS.errorRed}88`, borderRadius:14, padding:"11px", color:`${DS.errorRed}cc`,
+          fontWeight:700, cursor:"pointer", fontSize:13, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>📵 통화 종료</button>
       </div>
     </div>
   );
 }
 
 export default function PhoneEnglishApp() {
-  const [screen, setScreen] = useState("home");
-  const [selectedLesson, setSelectedLesson] = useState<typeof LESSONS[0] | null>(null);
+  const [screen, setScreen] = useState("home"); // ← 기획화면 제거, 바로 홈
+  const [selectedLesson, setSelectedLesson] = useState<typeof LESSONS[0]|null>(null);
   const [filterLevel, setFilterLevel] = useState("All");
   const [activeNav, setActiveNav] = useState(0);
 
-  
   const filtered = filterLevel === "All" ? LESSONS : LESSONS.filter(l => l.level === filterLevel);
 
-  if (screen === "planning") return (
-    <div style={{ minHeight:"100vh", background:`linear-gradient(160deg,${DS.forest} 0%,#0A1F14 60%,#1a2f20 100%)`, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-      <style>{GLOBAL_CSS}</style>
-      <div style={{ width:"100%", maxWidth:390 }}>
-        <div style={{ textAlign:"center", marginBottom:28, animation:"fadeIn 0.8s both" }}>
-          <div style={{ fontSize:42, marginBottom:10 }}>📞</div>
-          <h1 style={{ color:DS.white, fontWeight:800, fontSize:26, margin:0, fontFamily:"'Playfair Display',serif" }}>전화영어 앱</h1>
-          <p style={{ color:DS.sage, fontSize:13, marginTop:8, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>팀이 함께 앱을 설계 중이에요 ✨</p>
-          <div style={{ display:"flex", justifyContent:"center", gap:8, marginTop:14 }}>
-            {Object.values(TEAM).map((t,i) => (
-              <div key={t.name} title={t.name} style={{ width:40, height:40, borderRadius:"50%", background:`${t.color}22`, border:`2px solid ${t.color}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, animation:`fadeUp 0.5s ${i*0.1}s both` }}>{t.emoji}</div>
-            ))}
-          </div>
-        </div>
-        <div style={{ background:"rgba(255,255,255,0.06)", backdropFilter:"blur(16px)", borderRadius:24, padding:"20px 18px", border:"1px solid rgba(255,255,255,0.12)", display:"flex", flexDirection:"column", gap:14, boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
-          <div style={{ height:1, background:"rgba(255,255,255,0.1)" }}/>
-          {TEAM_CHAT.map((msg,i) => (
-            <TeamChatBubble key={i} msg={msg} visible={visibleChats.includes(i)}/>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
   if (screen === "call" && selectedLesson) return (
-    <div style={{ maxWidth:390, margin:"0 auto", height:"100vh", overflow:"hidden" }}>
+    <>
       <style>{GLOBAL_CSS}</style>
       <CallScreen lesson={selectedLesson} onEnd={() => setScreen("home")}/>
-    </div>
+    </>
   );
 
   return (
-    <div style={{ maxWidth:390, margin:"0 auto", minHeight:"100vh", background:DS.cream, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>
+    <div style={{ width:"100vw", height:"100dvh", background:DS.cream,
+      fontFamily:"'DM Sans','Noto Sans KR',sans-serif", display:"flex", flexDirection:"column", overflow:"hidden" }}>
       <style>{GLOBAL_CSS}</style>
 
-      <div style={{ background:`linear-gradient(160deg,${DS.forest} 0%,${DS.moss} 100%)`, padding:"28px 22px 32px", borderRadius:"0 0 36px 36px", position:"relative", overflow:"hidden", boxShadow:`0 8px 32px ${DS.forest}55` }}>
-        <div style={{ position:"absolute", right:-30, top:-30, width:160, height:160, borderRadius:"50%", background:`${DS.gold}12`, border:`1px solid ${DS.gold}20` }}/>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative", zIndex:1 }}>
-          <div>
-            <div style={{ color:DS.sage, fontSize:11, letterSpacing:"0.07em", textTransform:"uppercase", fontWeight:600 }}>Good Morning 👋</div>
-            <div style={{ color:DS.white, fontWeight:800, fontSize:24, marginTop:4, fontFamily:"'Playfair Display',serif", lineHeight:1.2 }}>오늘도 영어<br/>한 걸음씩!</div>
-          </div>
-          <div style={{ background:`${DS.gold}22`, border:`1.5px solid ${DS.gold}66`, borderRadius:18, padding:"8px 14px", display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ fontSize:18 }}>🔥</span>
+      {/* 스크롤 영역 */}
+      <div style={{ flex:1, overflowY:"auto" }}>
+
+        {/* 히어로 헤더 */}
+        <div style={{ background:`linear-gradient(160deg,${DS.forest} 0%,${DS.moss} 100%)`,
+          padding:"28px 22px 32px", paddingTop:"max(calc(env(safe-area-inset-top) + 16px), 28px)",
+          borderRadius:"0 0 36px 36px", position:"relative", overflow:"hidden",
+          boxShadow:`0 8px 32px ${DS.forest}55` }}>
+          <div style={{ position:"absolute", right:-30, top:-30, width:160, height:160,
+            borderRadius:"50%", background:`${DS.gold}12`, border:`1px solid ${DS.gold}20` }}/>
+
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative", zIndex:1 }}>
             <div>
-              <div style={{ color:DS.goldLight, fontWeight:800, fontSize:17, lineHeight:1 }}>7일</div>
-              <div style={{ color:`${DS.goldLight}88`, fontSize:9, fontWeight:600 }}>STREAK</div>
+              <div style={{ color:DS.sage, fontSize:11, letterSpacing:"0.07em", textTransform:"uppercase", fontWeight:600 }}>Good Morning 👋</div>
+              <div style={{ color:DS.white, fontWeight:800, fontSize:24, marginTop:4, fontFamily:"'Playfair Display',serif", lineHeight:1.2 }}>오늘도 영어<br/>한 걸음씩!</div>
+            </div>
+            <div style={{ background:`${DS.gold}22`, border:`1.5px solid ${DS.gold}66`, borderRadius:18, padding:"8px 14px", display:"flex", alignItems:"center", gap:6 }}>
+              <span style={{ fontSize:18 }}>🔥</span>
+              <div>
+                <div style={{ color:DS.goldLight, fontWeight:800, fontSize:17, lineHeight:1 }}>7일</div>
+                <div style={{ color:`${DS.goldLight}88`, fontSize:9, fontWeight:600 }}>STREAK</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div onClick={() => { setSelectedLesson(LESSONS[2]); setScreen("call"); }} className="cta-btn" style={{ marginTop:20, position:"relative", background:`linear-gradient(135deg,${DS.gold} 0%,${DS.goldLight} 100%)`, borderRadius:20, padding:"16px 18px", cursor:"pointer", display:"flex", alignItems:"center", gap:14, boxShadow:`0 6px 24px ${DS.gold}55`, transition:"all 0.2s" }}>
-          <StitchBorder color={DS.white} opacity={0.3}/>
-          <div style={{ width:52, height:52, background:"rgba(255,255,255,0.25)", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>💼</div>
-          <div style={{ flex:1, position:"relative", zIndex:1 }}>
-            <div style={{ color:"rgba(28,58,47,0.65)", fontSize:10, fontWeight:700, letterSpacing:"0.07em", textTransform:"uppercase" }}>오늘의 추천 레슨</div>
-            <div style={{ color:DS.forest, fontWeight:800, fontSize:16, marginTop:2, fontFamily:"'Playfair Display',serif" }}>비즈니스 미팅 영어</div>
-            <div style={{ color:"rgba(28,58,47,0.55)", fontSize:11, marginTop:2 }}>10분 · Intermediate</div>
-          </div>
-          <div style={{ width:42, height:42, background:DS.forest, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:DS.goldLight, fontSize:16, flexShrink:0 }}>▶</div>
-        </div>
-      </div>
 
-      <div style={{ display:"flex", gap:10, padding:"18px 18px 0" }}>
-        {[{ icon:"📞", value:"23", label:"총 통화" },{ icon:"⏱", value:"4.2h", label:"학습 시간" },{ icon:"✨", value:"85%", label:"정확도" }].map((s,i) => (
-          <div key={s.label} style={{ flex:1, background:DS.white, borderRadius:18, padding:"14px 10px", textAlign:"center", position:"relative", boxShadow:"0 3px 14px rgba(28,58,47,0.08)", border:`1.5px solid ${DS.paper}`, animation:`fadeUp 0.4s ${i*0.08+0.1}s both`, overflow:"hidden" }}>
-            <StitchBorder color={DS.gold} opacity={0.25}/>
-            <div style={{ fontSize:22 }}>{s.icon}</div>
-            <div style={{ fontWeight:800, fontSize:18, color:DS.forest, marginTop:4, fontFamily:"'Playfair Display',serif" }}>{s.value}</div>
-            <div style={{ fontSize:10, color:DS.muted, marginTop:1 }}>{s.label}</div>
+          <div onClick={() => { setSelectedLesson(LESSONS[2]); setScreen("call"); }} className="cta-btn"
+            style={{ marginTop:20, position:"relative", background:`linear-gradient(135deg,${DS.gold} 0%,${DS.goldLight} 100%)`,
+              borderRadius:20, padding:"16px 18px", cursor:"pointer", display:"flex", alignItems:"center", gap:14,
+              boxShadow:`0 6px 24px ${DS.gold}55`, transition:"all 0.2s" }}>
+            <StitchBorder color={DS.white} opacity={0.3}/>
+            <div style={{ width:52, height:52, background:"rgba(255,255,255,0.25)", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>💼</div>
+            <div style={{ flex:1, position:"relative", zIndex:1 }}>
+              <div style={{ color:"rgba(28,58,47,0.65)", fontSize:10, fontWeight:700, letterSpacing:"0.07em", textTransform:"uppercase" }}>오늘의 추천 레슨</div>
+              <div style={{ color:DS.forest, fontWeight:800, fontSize:16, marginTop:2, fontFamily:"'Playfair Display',serif" }}>비즈니스 미팅 영어</div>
+              <div style={{ color:"rgba(28,58,47,0.55)", fontSize:11, marginTop:2 }}>10분 · Intermediate</div>
+            </div>
+            <div style={{ width:42, height:42, background:DS.forest, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:DS.goldLight, fontSize:16, flexShrink:0 }}>▶</div>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div style={{ padding:"20px 18px 8px" }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-          <div style={{ fontWeight:800, fontSize:18, color:DS.forest, fontFamily:"'Playfair Display',serif" }}>레슨 선택</div>
-          <div style={{ fontSize:11, color:DS.muted }}>총 {filtered.length}개</div>
-        </div>
-        <div style={{ display:"flex", gap:7, marginBottom:14, overflowX:"auto", paddingBottom:2 }}>
-          {["All","Beginner","Intermediate","Advanced"].map(l => {
-            const active = filterLevel === l;
-            return (
-              <button key={l} onClick={() => setFilterLevel(l)} style={{ padding:"7px 14px", borderRadius:22, whiteSpace:"nowrap", cursor:"pointer", background: active ? DS.forest : DS.white, color: active ? DS.goldLight : DS.muted, border: active ? "none" : "1.5px solid #DDD5C8", fontSize:11, fontWeight:700, fontFamily:"'DM Sans',sans-serif", boxShadow: active ? `0 3px 12px ${DS.forest}44` : "none", transition:"all 0.2s" }}>
-                {l === "All" ? "전체" : LEVEL_META[l]?.label || l}
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-          {filtered.map((lesson,i) => (
-            <LessonCard key={lesson.id} lesson={lesson} index={i} onSelect={l => { setSelectedLesson(l); setScreen("call"); }}/>
+        {/* 통계 */}
+        <div style={{ display:"flex", gap:10, padding:"18px 18px 0" }}>
+          {[{icon:"📞",value:"23",label:"총 통화"},{icon:"⏱",value:"4.2h",label:"학습 시간"},{icon:"✨",value:"85%",label:"정확도"}].map((s,i) => (
+            <div key={s.label} style={{ flex:1, background:DS.white, borderRadius:18, padding:"14px 10px", textAlign:"center",
+              position:"relative", boxShadow:"0 3px 14px rgba(28,58,47,0.08)", border:`1.5px solid ${DS.paper}`,
+              animation:`fadeUp 0.4s ${i*0.08+0.1}s both`, overflow:"hidden" }}>
+              <StitchBorder color={DS.gold} opacity={0.25}/>
+              <div style={{ fontSize:22 }}>{s.icon}</div>
+              <div style={{ fontWeight:800, fontSize:18, color:DS.forest, marginTop:4, fontFamily:"'Playfair Display',serif" }}>{s.value}</div>
+              <div style={{ fontSize:10, color:DS.muted, marginTop:1 }}>{s.label}</div>
+            </div>
           ))}
         </div>
-      </div>
 
-      <div style={{ margin:"18px 18px 90px", background:`linear-gradient(135deg,${DS.paper},#EDE3D5)`, borderRadius:18, padding:"12px 16px", border:`1px solid ${DS.gold}44`, display:"flex", alignItems:"center", gap:10, position:"relative", overflow:"hidden" }}>
-        <StitchBorder color={DS.gold} opacity={0.4}/>
-        <div style={{ fontSize:22 }}>🎨</div>
-        <div>
-          <div style={{ fontSize:11, fontWeight:700, color:DS.gold, letterSpacing:"0.05em", fontFamily:"'DM Sans',sans-serif" }}>Designed by Mia</div>
-          <div style={{ fontSize:11, color:DS.muted, marginTop:1, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>Cream & Forest 팔레트 · 스티치 디테일 적용</div>
+        {/* 레슨 섹션 */}
+        <div style={{ padding:"20px 18px 8px" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+            <div style={{ fontWeight:800, fontSize:18, color:DS.forest, fontFamily:"'Playfair Display',serif" }}>레슨 선택</div>
+            <div style={{ fontSize:11, color:DS.muted }}>총 {filtered.length}개</div>
+          </div>
+          <div style={{ display:"flex", gap:7, marginBottom:14, overflowX:"auto", paddingBottom:2 }}>
+            {["All","Beginner","Intermediate","Advanced"].map(l => {
+              const active = filterLevel === l;
+              return (
+                <button key={l} onClick={() => setFilterLevel(l)} style={{ padding:"7px 14px", borderRadius:22, whiteSpace:"nowrap",
+                  cursor:"pointer", background:active?DS.forest:DS.white, color:active?DS.goldLight:DS.muted,
+                  border:active?"none":"1.5px solid #DDD5C8", fontSize:11, fontWeight:700, fontFamily:"'DM Sans',sans-serif",
+                  boxShadow:active?`0 3px 12px ${DS.forest}44`:"none", transition:"all 0.2s" }}>
+                  {l==="All"?"전체":LEVEL_META[l]?.label||l}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            {filtered.map((lesson,i) => (
+              <LessonCard key={lesson.id} lesson={lesson} index={i} onSelect={l => { setSelectedLesson(l); setScreen("call"); }}/>
+            ))}
+          </div>
         </div>
+        <div style={{ height:80 }}/>
       </div>
 
-      <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", maxWidth:390, background:DS.white, borderTop:`1px solid ${DS.paper}`, padding:"10px 0 22px", display:"flex", boxShadow:`0 -6px 28px rgba(28,58,47,0.08)` }}>
-        {[{ icon:"🏠", label:"홈" },{ icon:"📚", label:"레슨" },{ icon:"📊", label:"리포트" },{ icon:"👤", label:"내 정보" }].map((n,i) => (
-          <div key={n.label} className="nav-item" onClick={() => setActiveNav(i)} style={{ flex:1, textAlign:"center", cursor:"pointer", color: activeNav===i ? DS.forest : "#C8BFB0", transition:"color 0.2s" }}>
+      {/* 바텀 네비 */}
+      <div style={{ background:DS.white, borderTop:`1px solid ${DS.paper}`, paddingTop:10,
+        paddingBottom:"max(calc(env(safe-area-inset-bottom) + 6px), 16px)",
+        display:"flex", boxShadow:`0 -6px 28px rgba(28,58,47,0.08)`, flexShrink:0 }}>
+        {[{icon:"🏠",label:"홈"},{icon:"📚",label:"레슨"},{icon:"📊",label:"리포트"},{icon:"👤",label:"내 정보"}].map((n,i) => (
+          <div key={n.label} onClick={() => setActiveNav(i)} style={{ flex:1, textAlign:"center", cursor:"pointer",
+            color:activeNav===i?DS.forest:"#C8BFB0", transition:"color 0.2s" }}>
             <div style={{ fontSize:22 }}>{n.icon}</div>
-            <div style={{ fontSize:10, marginTop:2, fontWeight:activeNav===i?700:400, color: activeNav===i ? DS.gold : undefined, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>{n.label}</div>
+            <div style={{ fontSize:10, marginTop:2, fontWeight:activeNav===i?700:400,
+              color:activeNav===i?DS.gold:undefined, fontFamily:"'DM Sans','Noto Sans KR',sans-serif" }}>{n.label}</div>
             {activeNav===i && <div style={{ width:20, height:2.5, background:DS.gold, borderRadius:2, margin:"3px auto 0" }}/>}
           </div>
         ))}
