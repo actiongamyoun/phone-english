@@ -260,20 +260,6 @@ export default function PhoneEnglishApp() {
           </div>
         </div>
 
-        {/* 통계 */}
-        <div style={{ display:"flex", gap:10, padding:"18px 18px 0" }}>
-          {[{icon:"📞",value:"23",label:"총 통화"},{icon:"⏱",value:"4.2h",label:"학습 시간"},{icon:"✨",value:"85%",label:"정확도"}].map((s,i) => (
-            <div key={s.label} style={{ flex:1, background:DS.white, borderRadius:18, padding:"14px 10px", textAlign:"center",
-              position:"relative", boxShadow:"0 3px 14px rgba(28,58,47,0.08)", border:`1.5px solid ${DS.paper}`,
-              animation:`fadeUp 0.4s ${i*0.08+0.1}s both`, overflow:"hidden" }}>
-              <StitchBorder color={DS.gold} opacity={0.25}/>
-              <div style={{ fontSize:22 }}>{s.icon}</div>
-              <div style={{ fontWeight:800, fontSize:18, color:DS.forest, marginTop:4, fontFamily:"'Playfair Display',serif" }}>{s.value}</div>
-              <div style={{ fontSize:10, color:DS.muted, marginTop:1 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-
         {/* 레슨 섹션 */}
         <div style={{ padding:"20px 18px 8px" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
