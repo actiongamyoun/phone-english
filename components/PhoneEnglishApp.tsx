@@ -261,22 +261,12 @@ function CallScreen({ lesson, onEnd }: { lesson: typeof LESSONS[0]; onEnd: () =>
 }
 
 export default function PhoneEnglishApp() {
-  const [screen, setScreen] = useState("planning");
-  const [visibleChats, setVisibleChats] = useState<number[]>([]);
+  const [screen, setScreen] = useState("home");
   const [selectedLesson, setSelectedLesson] = useState<typeof LESSONS[0] | null>(null);
   const [filterLevel, setFilterLevel] = useState("All");
   const [activeNav, setActiveNav] = useState(0);
 
-  useEffect(() => {
-    if (screen !== "planning") return;
-    TEAM_CHAT.forEach((msg, i) => {
-      setTimeout(() => {
-        setVisibleChats(v => [...v, i]);
-        if (i === TEAM_CHAT.length - 1) setTimeout(() => setScreen("home"), 2000);
-      }, msg.delay + 400);
-    });
-  }, [screen]);
-
+  
   const filtered = filterLevel === "All" ? LESSONS : LESSONS.filter(l => l.level === filterLevel);
 
   if (screen === "planning") return (
